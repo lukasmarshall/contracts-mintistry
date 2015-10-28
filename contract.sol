@@ -1,8 +1,9 @@
 /*This is an untested contract, for loading/testing purposes only*/
 contract customCoin { 
   mapping (address => uint) public balance;
-  event CoinTransfer(address from_address, address to_address, uint amount);
-  event CoinIssue(address issuer, address to_address, uint amount);
+  event Transfer(address indexed from, address indexed to, uint256 value);
+  event AddressApproval(address indexed address, address indexed proxy, bool result);
+  event AddressApprovalOnce(address indexed address, address indexed proxy, uint256 value);
   address public issuer;
   bytes32 public name;
 
@@ -14,37 +15,48 @@ contract customCoin {
   }
 
   /* Simple coin sending function */
-  function send(address to_address, uint amount) returns(uint success) {
-    if (balance[msg.sender] < amount) return 0;
-    balance[msg.sender] -= amount;
-    balance[to_address] += amount;
-    CoinTransfer(msg.sender, to_address, amount);
-    return 1;
+  function transfer(address _to, uint256 _value) returns(bool success) {
+    if (balance[msg.sender] < _value) return false;
+    balance[msg.sender] -= _value;
+    balance[_to] += _value;
+    Transfer(msg.sender, _to, _value);
+    return true;
   }
 
-  /* Simple coin sending function again but with a from address, to comply with metacoin standard. */
-  function send(address to_address, uint amount, address from_address) returns(uint success) {
-    if (msg.sender != from_address) return 0;
-    if (balance[from_address] < amount) return 0;
-    balance[from_address] -= amount;
-    balance[to_address] += amount;
-    CoinTransfer(from_address, to_address, amount);
-    return 1;
+  /* Simple coin sending function again but with a from address. 
+  For the moment we will not allow account authorisation so this will function the same as the transfer function above.*/
+  function transferFrom(address _from, address _to, uint256 _value) returns(bool success) {
+    if (msg.sender != _from) return false;
+    if (balance[_from] < _value) return false;
+    balance[_from] -= _value;
+    balance[_to] += _value;
+    Transfer(_from, _to, _value);
+    return true;
   }
 
-  /*Allows the issuer to create new coins in an individual's account. */
-  function issueCoin(address to_address, uint amount) returns(uint success) {
-    if (msg.sender != issuer) return 0;
-    balance[to_address] += amount;
-    CoinIssue(msg.sender, to_address, amount);
-    return 1;
+  function balanceOf(address _address) constant returns (uint256 balance){
+    return balance[_address];
   }
 
-  /*Allows the coin to be decoupled from any mintistry-linked addresses.*/
-  function changeIssuer(address newIssuer) returns(uint success){
-    if(msg.sender != issuer) return 0;
-    issuer = newIssuer;
-    return 1;
+  function approve(address _address) returns (bool _success){
+    return false;
   }
+
+  function unapprove(address _address) returns (bool _success){
+    return false;
+  }
+
+  function isApprovedFor(address _target, address _proxy) constant returns (bool _r){
+    return false;
+  }
+
+  function approveOnce(address _address, uint256 _maxValue) returns (bool _success){
+    return false;
+  }
+
+  function isApprovedOnceFor(address _target, address _proxy) returns (uint256 _maxValue){
+    return 0;
+  }
+
 
 }
