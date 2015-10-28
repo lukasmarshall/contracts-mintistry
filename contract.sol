@@ -1,4 +1,7 @@
-/*This is an untested contract, for loading/testing purposes only*/
+/*Standard Mintistry Metacoin Implementation
+Based on Ethereum tutorial material and API outlined at:
+https://github.com/ethereum/wiki/wiki/Standardized_Contract_APIs
+*/
 contract customCoin { 
   mapping (address => uint) public balance;
   event Transfer(address indexed from, address indexed to, uint256 value);
@@ -34,10 +37,13 @@ contract customCoin {
     return true;
   }
 
+  /*Return the balance of a given address - can already be used with balance() but complying with API standard here.*/
   function balanceOf(address _address) constant returns (uint256 balance){
     return balance[_address];
   }
 
+  /*The following functions are set to return false as in this implementation 
+  we do not want to authorise direct debit accounts.*/
   function approve(address _address) returns (bool _success){
     return false;
   }
